@@ -1,0 +1,2 @@
+RewriteEngine on
+RewriteRule convert/(.*) index.php?$1
