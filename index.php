@@ -1,5 +1,7 @@
 <?php
 
+ob_start("ob_gzhandler");
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: *");
 if (filter_input(INPUT_SERVER, "REQUEST_METHOD") === "OPTIONS")
@@ -25,18 +27,17 @@ if (substr($url, strlen($url) - 5) === "/info") {
         $h = ($h + 1) >> 1;
     }
     $scales = [];
-    while ($level >= 0) {
-        if ($Width < 4000) {
-            $scales[] = [
-                "key" => (string) $level,
-                "size" => [$Width, $Height, 1],
-                "resolution" => [1, 1, 1],
-                "chunk_sizes" => [[256, 256, 1]],
-                "encoding" => "raw"
-            ];
-            break;
-        }
+    $resolution = 1;
+    while ($Width > 1 || $Height > 1) {
+        $scales[] = [
+            "key" => (string) $level,
+            "size" => [$Width, $Height, 1],
+            "resolution" => [$resolution, $resolution, $resolution],
+            "chunk_sizes" => [[256, 256, 1]],
+            "encoding" => "raw"
+        ];
         $level--;
+        $resolution <<= 1;
         $Width = ($Width + 1) >> 1;
         $Height = ($Height + 1) >> 1;
     }
