@@ -75,11 +75,11 @@ if (substr($url, strlen($url) - 5) === "/info") {
         $image = imagecreatefromjpeg($filename);
     for ($y = $yfrom; $y < $yto; $y++)
         for ($x = $xfrom; $x < $xto; $x++)
-            echo chr(imagecolorat($image, $x, $y));
+            echo chr(imagecolorat($image, $x, $y) >> 16);
     for ($y = $yfrom; $y < $yto; $y++)
         for ($x = $xfrom; $x < $xto; $x++)
             echo chr(imagecolorat($image, $x, $y) >> 8);
     for ($y = $yfrom; $y < $yto; $y++)
         for ($x = $xfrom; $x < $xto; $x++)
-            echo chr(imagecolorat($image, $x, $y) >> 16);
+            echo chr(imagecolorat($image, $x, $y));
 }
