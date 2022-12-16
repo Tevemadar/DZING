@@ -1,0 +1,26 @@
+# Serving Neuroglancer precomputed data from DeepZoom pyramids
+
+Fed into the official Neuroglancer demo: [`https://neuroglancer-demo.appspot.com`](https://neuroglancer-demo.appspot.com/#!%7B%22dimensions%22:%7B%22x%22:%5B1e-9%2C%22m%22%5D%2C%22y%22:%5B1e-9%2C%22m%22%5D%2C%22z%22:%5B1e-9%2C%22m%22%5D%7D%2C%22position%22:%5B16152.5185546875%2C13498.8154296875%2C0.5%5D%2C%22crossSectionScale%22:79.4398395522613%2C%22projectionOrientation%22:%5B-0.002367608482018113%2C0.006638523191213608%2C0.005079911556094885%2C0.9999622702598572%5D%2C%22projectionScale%22:4096%2C%22layers%22:%5B%7B%22type%22:%22image%22%2C%22source%22:%22precomputed://https://dzing-dzing.apps-dev.hbp.eu/convert/https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-7e9a11b7-b27f-67d7-95c8-3b72bb5086e9/D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013.dzi%22%2C%22tab%22:%22rendering%22%2C%22shader%22:%22void%20main%20%28%29%20%7B%5CnemitRGB%28vec3%28toNormalized%28getDataValue%280%29%29%2C%5CntoNormalized%28getDataValue%281%29%29%2C%5CntoNormalized%28getDataValue%282%29%29%29%29%3B%5Cn%7D%5Cn%22%2C%22channelDimensions%22:%7B%22c%5E%22:%5B1%2C%22%22%5D%7D%2C%22name%22:%22D1R_P70_F_E15_s013.dzi%22%7D%5D%2C%22selectedLayer%22:%7B%22visible%22:true%2C%22layer%22:%22D1R_P70_F_E15_s013.dzi%22%7D%2C%22layout%22:%22xy%22%7D).
+
+This service transparently resolves Neuroglancer requests using DZI data.  
+A link of an actual `.dzi` file can be prefixed with `https://dzing-dzing.apps-dev.hbp.eu/convert/`, and used as a `precomputed` source for Neuroglancer and compatible viewers.
+
+Root folder of an example pyramid (stored in an S3 object storage):  
+https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-7e9a11b7-b27f-67d7-95c8-3b72bb5086e9/?prefix=D1R_P70_F_E15_s013.tif/&delimiter=/&format=text  
+> `D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013.dzi`
+> `D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013_files/`
+
+(What is important: it is a `xy.dzi` descriptor with a matching `xy_files` folder with the tiles)
+
+Actual link of that `.dzi` file:  
+[`https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-7e9a11b7-b27f-67d7-95c8-3b72bb5086e9/D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013.dzi`](https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-7e9a11b7-b27f-67d7-95c8-3b72bb5086e9/D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013.dzi)
+>     <?xml version="1.0" encoding="utf-8"?>
+>     <Image TileSize="256" Overlap="1" Format="png" xmlns="http://schemas.microsoft.com/deepzoom/2009">
+>     <Size Width="33292" Height="26603" />
+>     </Image>
+
+"Forged" URL, asking for `info` (which is a JSON internally):  
+[`https://dzing-dzing.apps-dev.hbp.eu/convert/https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-7e9a11b7-b27f-67d7-95c8-3b72bb5086e9/D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013.dzi/info`](https://dzing-dzing.apps-dev.hbp.eu/convert/https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-7e9a11b7-b27f-67d7-95c8-3b72bb5086e9/D1R_P70_F_E15_s013.tif/D1R_P70_F_E15_s013.dzi/info)
+>     {"@type":"neuroglancer_multiscale_volume","type":"image","data_type":"uint8","num_channels":3,"scales":[{"key":"16","size":[33292,26603,1],"resolution":[1,1,1],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"15","size":[16646,13302,1],"resolution":[2,2,2],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"14","size":[8323,6651,1],"resolution":[4,4,4],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"13","size":[4162,3326,1],"resolution":[8,8,8],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"12","size":[2081,1663,1],"resolution":[16,16,16],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"11","size":[1041,832,1],"resolution":[32,32,32],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"10","size":[521,416,1],"resolution":[64,64,64],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"9","size":[261,208,1],"resolution":[128,128,128],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"8","size":[131,104,1],"resolution":[256,256,256],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"7","size":[66,52,1],"resolution":[512,512,512],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"6","size":[33,26,1],"resolution":[1024,1024,1024],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"5","size":[17,13,1],"resolution":[2048,2048,2048],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"4","size":[9,7,1],"resolution":[4096,4096,4096],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"3","size":[5,4,1],"resolution":[8192,8192,8192],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"2","size":[3,2,1],"resolution":[16384,16384,16384],"chunk_sizes":[[256,256,1]],"encoding":"raw"},{"key":"1","size":[2,1,1],"resolution":[32768,32768,32768],"chunk_sizes":[[256,256,1]],"encoding":"raw"}]}
+
+So the 33292 x 26603 DZI pyramid (with 256x256 tiles) pretends being a 33292 x 26603 x 1 `precomputed` multiscale volume, built from 256x256x1 chunks, with all the scaling levels which are available from a DZI.
